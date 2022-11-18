@@ -8,10 +8,17 @@ const {expressjwt} = require('express-jwt')
 app.use(express.json())
 app.use(morgan('dev'))
 
-mongoose.connect(
-  'mongodb://localhost:27017/user-authentication',
+mongoose.connect(process.env.MONGODB_URI,
   () => console.log('Connected to the DB')
 )
+
+if (process.env.NODE_ENV === 'production') {
+  //*Set static folder up in production
+  app.use(express.static('client/build'));
+
+  app.get('*', (req,res) => res.sendFile(path.resolve(__dirname, 'client', 'build','index.html')));
+}
+
 
 app.use('/auth', require('./routes/authRouter.js'))
 app.use('/api', expressjwt({ secret: process.env.SECRET, algorithms: ['HS256'] })) // req.user
@@ -28,3 +35,4 @@ app.use((err, req, res, next) => {
 app.listen(9000, () => {
   console.log(`Server is running on local port 9000`)
 })
+
