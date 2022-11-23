@@ -4,9 +4,12 @@ require('dotenv').config()
 const morgan = require('morgan')
 const mongoose = require('mongoose')
 const {expressjwt} = require('express-jwt')
+const cors = require('cors')
 
 app.use(express.json())
 app.use(morgan('dev'))
+app.use(cors())
+
 
 mongoose.connect(process.env.MONGODB_URI,
   () => console.log('Connected to the DB')
