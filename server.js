@@ -8,7 +8,20 @@ const cors = require('cors')
 
 app.use(express.json())
 app.use(morgan('dev'))
-app.use(cors({origin: "http://localhost:3000"}))
+
+var whitelist = ['http://localhost:3000', 'https://rlm-frontend.onrender.com']
+var corsOptionsDelegate = function (req, callback) {
+  var corsOptions;
+  if (whitelist.indexOf(req.header('Origin')) !== -1) {
+    return { origin: true } // reflect (enable) the requested origin in the CORS response
+  } else {
+    return { origin: false } // disable CORS for this request
+  }
+  // callback(null, corsOptions) // callback expects two parameters: error and options
+}
+
+app.use(cors(corsOptionsDelegate))
+
 
 
 mongoose.connect(process.env.MONGODB_URI,
@@ -21,6 +34,7 @@ if (process.env.NODE_ENV === 'production') {
 
   app.get('*', (req,res) => res.sendFile(path.resolve(__dirname, 'client', 'build','index.html')));
 }
+
 
 
 app.use('/auth', require('./routes/authRouter.js'))
