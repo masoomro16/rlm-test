@@ -8,7 +8,7 @@ const cors = require('cors')
 
 app.use(express.json())
 app.use(morgan('dev'))
-app.use(cors())
+app.use(cors({origin: "http://localhost:3000"}))
 
 
 mongoose.connect(process.env.MONGODB_URI,
