@@ -5,6 +5,7 @@ const morgan = require('morgan')
 const mongoose = require('mongoose')
 const {expressjwt} = require('express-jwt')
 const cors = require('cors')
+const path = require('path');
 
 app.use(express.json())
 app.use(morgan('dev'))
@@ -21,8 +22,6 @@ var corsOptionsDelegate = function (req, callback) {
   // callback(null, corsOptions) // callback expects two parameters: error and options
 }
 
-
-
 mongoose.connect(process.env.MONGODB_URI,
   () => console.log('Connected to the DB')
 )
@@ -34,12 +33,7 @@ mongoose.connect(process.env.MONGODB_URI,
 //   app.get('*', (req,res) => res.sendFile(path.resolve(__dirname, 'client', 'build','index.html')));
 // }
 
-//static files
-app.use(express.static(path.join(__dirname, "./client/build")));
 
-app.get("*", function (req, res) {
-  res.sendFile(path.join(__dirname, "./client/build/index.html"));
-});
 
 app.use('/auth', require('./routes/authRouter.js'))
 app.use('/api', expressjwt({ secret: process.env.SECRET, algorithms: ['HS256'] })) // req.user
@@ -52,6 +46,13 @@ app.use((err, req, res, next) => {
   }
   return res.send({errMsg: err.message})
 })
+//static files
+app.use(express.static(path.join(__dirname, "client", "build")))
+
+
+app.get("*", function (req, res) {
+  res.sendFile(path.join(__dirname, "./client/build/index.html"));
+});
 
 app.listen(process.env.PORT || 9000, () => {
   console.log(`Server is running on local port 9000`)
